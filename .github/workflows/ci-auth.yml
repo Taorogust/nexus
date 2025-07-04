@@ -1,0 +1,87 @@
+@"
+name: CI – Auth Service
+
+on:
+  push:
+    paths:
+      - 'services/auth/**'
+  pull_request:
+    paths:
+      - 'services/auth/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/tu-org/actiora/auth
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install linters
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: Run linters
+        run: |
+          cd services/auth
+          golangci-lint run ./...
+
+      - name: Run unit tests
+        run: |
+          cd services/auth
+          go test ./... -v -coverprofile=coverage.out
+
+      - name: Build Docker image
+        run: |
+          cd services/auth
+          docker build -t $IMAGE_NAME:latest .
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image
+        if: github.event_name != 'pull_request'
+        run: |
+          docker push $IMAGE_NAME:latest
+
+      - name: Install Cosign
+        run: |
+          COSIGN_VERSION="v2.0.0"
+          wget -qO cosign https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64
+          chmod +x cosign
+          Move-Item cosign "/usr/local/bin/cosign"
+
+      - name: Sign Docker image
+        if: github.event_name != 'pull_request'
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign sign --key ${{ secrets.COSIGN_KEY }} $IMAGE_NAME:latest
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: auth-coverage
+          path: services/auth/coverage.out
+"@ | Out-File -FilePath .github\workflows\ci-auth.yml -Encoding utf8
