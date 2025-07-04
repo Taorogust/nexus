@@ -1,0 +1,35 @@
+name: CD – ArgoCD Base Platform
+
+on:
+  workflow_run:
+    workflows: ['CI – Base Platform']
+    types: [completed]
+
+jobs:
+  sync-base:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd
+          sudo mv argocd /usr/local/bin/
+
+      - name: Log in to ArgoCD
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_USER:   ${{ secrets.ARGOCD_USER }}
+          ARGOCD_PASS:   ${{ secrets.ARGOCD_PASS }}
+        run: |
+          argocd login $ARGOCD_SERVER \
+            --username $ARGOCD_USER \
+            --password $ARGOCD_PASS \
+            --insecure
+
+      - name: Sync Base Platform
+        run: argocd app sync base-platform
