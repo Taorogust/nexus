@@ -5,42 +5,38 @@ auth:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
     tag: "latest"
     pullPolicy: IfNotPresent
-  # número de réplicas específicas para auth (si lo necesitas distinto al global)
   replicaCount: 1
 
-  # configuración OIDC para el servicio auth
+  # ← Añadimos la configuración de OIDC
   oidc:
-    issuerUrl: "https://<TU_ISSUER_URL>/auth/realms/<TU_REALM>"   # p.ej. el endpoint de tu Keycloak o Auth0
-    clientId: "<TU_CLIENT_ID_YA_CREADO>"
-    clientSecret:
-      valueFrom:
-        secretKeyRef:
-          name: auth-oidc-secret
-          key: client-secret
+    issuerUrl: "https://<TU_ISSUER_URL>/oauth2/default"   # ← pon aquí tu URL de issuer
+    clientId: "actiora-client"                             # ← pon aquí tu client-id
+    # El client-secret lo recuperamos del Secret auth-oidc-secret
 
 eventbus:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/eventbus
     tag: "latest"
     pullPolicy: IfNotPresent
+  replicaCount: 1
 
 config:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/config
     tag: "latest"
     pullPolicy: IfNotPresent
+  replicaCount: 1
 
 normsApi:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/norms-api
     tag: "latest"
     pullPolicy: IfNotPresent
+  replicaCount: 1
 
 ledgerAdapter:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/ledger-adapter
     tag: "latest"
     pullPolicy: IfNotPresent
-
-# Si quieres, puedes definir un replicaCount global:
-replicaCount: 1
+  replicaCount: 1
