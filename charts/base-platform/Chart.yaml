@@ -1,0 +1,6 @@
+﻿apiVersion: v2
+name: base-platform
+description: "Helm chart para desplegar los microservicios base de Actiora"
+type: application
+version: 0.1.0
+appVersion: "1.0"
