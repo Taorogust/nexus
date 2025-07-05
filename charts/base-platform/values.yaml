@@ -1,0 +1,31 @@
+﻿auth:
+  image:
+    repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+eventbus:
+  image:
+    repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/eventbus
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+config:
+  image:
+    repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/config
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+normsApi:
+  image:
+    repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/norms-api
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+ledgerAdapter:
+  image:
+    repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/ledger-adapter
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+replicaCount: 1
