@@ -7,6 +7,7 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    # La ruta que ALB usará para chequear salud
     alb.ingress.kubernetes.io/healthcheck-path: /health
 spec:
   ingressClassName: alb
@@ -14,7 +15,7 @@ spec:
     - host: auth.midominio.com
       http:
         paths:
-          # 1) ruta explícita para /health
+          # 1) Primero, la ruta explícita de health
           - path: /health
             pathType: Prefix
             backend:
@@ -22,7 +23,7 @@ spec:
                 name: auth
                 port:
                   number: 80
-          # 2) resto de rutas
+          # 2) Luego, el resto de rutas de la app
           - path: /
             pathType: Prefix
             backend:
