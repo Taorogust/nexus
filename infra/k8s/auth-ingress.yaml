@@ -11,9 +11,18 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: auth.midominio.com      # ← tu dominio real
+    - host: auth.midominio.com
       http:
         paths:
+          # 1) ruta explícita para /health
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: auth
+                port:
+                  number: 80
+          # 2) resto de rutas
           - path: /
             pathType: Prefix
             backend:
