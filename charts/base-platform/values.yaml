@@ -1,8 +1,22 @@
-﻿auth:
+﻿# charts/base-platform/values.yaml
+
+auth:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
     tag: "latest"
     pullPolicy: IfNotPresent
+  # número de réplicas específicas para auth (si lo necesitas distinto al global)
+  replicaCount: 1
+
+  # configuración OIDC para el servicio auth
+  oidc:
+    issuerUrl: "https://<TU_ISSUER_URL>/auth/realms/<TU_REALM>"   # p.ej. el endpoint de tu Keycloak o Auth0
+    clientId: "<TU_CLIENT_ID_YA_CREADO>"
+    clientSecret:
+      valueFrom:
+        secretKeyRef:
+          name: auth-oidc-secret
+          key: client-secret
 
 eventbus:
   image:
@@ -28,4 +42,5 @@ ledgerAdapter:
     tag: "latest"
     pullPolicy: IfNotPresent
 
+# Si quieres, puedes definir un replicaCount global:
 replicaCount: 1
