@@ -7,11 +7,9 @@ auth:
     pullPolicy: IfNotPresent
   replicaCount: 1
 
-  # ← Añadimos la configuración de OIDC
   oidc:
-    issuerUrl: "https://<TU_ISSUER_URL>/oauth2/default"   # ← pon aquí tu URL de issuer
-    clientId: "actiora-client"                             # ← pon aquí tu client-id
-    # El client-secret lo recuperamos del Secret auth-oidc-secret
+    issuerUrl: "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"
+    clientId: "75nse1j2aunml5eimimni71j"
 
 eventbus:
   image:
