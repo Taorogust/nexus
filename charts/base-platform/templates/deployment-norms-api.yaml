@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "base-platform.fullname" . }}-norms-api
+  labels:
+    app: norms-api
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: norms-api
+  template:
+    metadata:
+      labels:
+        app: norms-api
+    spec:
+      containers:
+        - name: norms-api
+          image: "{{ .Values.normsApi.image.repository }}:{{ .Values.normsApi.image.tag }}"
+          imagePullPolicy: {{ .Values.normsApi.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

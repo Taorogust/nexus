@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "base-platform.fullname" . }}-norms-api
+  labels:
+    app: norms-api
+spec:
+  type: ClusterIP
+  selector:
+    app: norms-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP

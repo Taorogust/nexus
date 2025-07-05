@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "base-platform.fullname" . }}-ledger-adapter
+  labels:
+    app: ledger-adapter
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: ledger-adapter
+  template:
+    metadata:
+      labels:
+        app: ledger-adapter
+    spec:
+      containers:
+        - name: ledger-adapter
+          image: "{{ .Values.ledgerAdapter.image.repository }}:{{ .Values.ledgerAdapter.image.tag }}"
+          imagePullPolicy: {{ .Values.ledgerAdapter.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
