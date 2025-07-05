@@ -26,6 +26,10 @@ on:
       - 'Makefile'
       - 'docker-compose.yml'
 
+env:
+  AWS_REGION: eu-west-1
+  AWS_ACCOUNT_ID: 763695378748    # ← Sustituye por tu AWS Account ID
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
@@ -36,6 +40,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up Go 1.23
         uses: actions/setup-go@v4
@@ -57,10 +68,29 @@ jobs:
           golangci-lint run ./...
           go test ./... -v -coverprofile=coverage.out
 
-      - name: Build Docker image ${{ matrix.svc }}
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password \
+            --region $AWS_REGION | \
+          docker login \
+            --username AWS \
+            --password-stdin \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - name: Build, tag & push Docker image ${{ matrix.svc }}
         working-directory: services/${{ matrix.svc }}
-        run: docker build -t ghcr.io/tu-org/actiora/${{ matrix.svc }}:latest .
-      
+        run: |
+          # Variables
+          REPO_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${{ matrix.svc }}
+          IMAGE_TAG=${{ github.sha }}
+
+          # Build
+          docker build -t $REPO_URI:latest -t $REPO_URI:$IMAGE_TAG .
+
+          # Push both tags
+          docker push $REPO_URI:latest
+          docker push $REPO_URI:$IMAGE_TAG
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v3

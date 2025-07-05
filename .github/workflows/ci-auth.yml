@@ -8,11 +8,15 @@ on:
     paths:
       - 'services/auth/**'
 
+env:
+  AWS_REGION: eu-west-1
+  AWS_ACCOUNT_ID: 763695378748
+  ECR_REGISTRY: 763695378748.dkr.ecr.eu-west-1.amazonaws.com
+  SERVICE: auth
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ghcr.io/tu-org/actiora/auth
 
     steps:
       - name: Checkout repo
@@ -32,8 +36,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Install linters
-        run: |
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
       - name: Run linters
         run: |
@@ -45,37 +48,47 @@ jobs:
           cd services/auth
           go test ./... -v -coverprofile=coverage.out
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | \
+            docker login --username AWS --password-stdin $ECR_REGISTRY
+
       - name: Build Docker image
         run: |
           cd services/auth
-          docker build -t $IMAGE_NAME:latest .
+          docker build \
+            -t $ECR_REGISTRY/$SERVICE:${{ github.sha }} \
+            -t $ECR_REGISTRY/$SERVICE:latest \
+            .
 
-      - name: Log in to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push image
+      - name: Push to ECR
         if: github.event_name != 'pull_request'
         run: |
-          docker push $IMAGE_NAME:latest
+          docker push $ECR_REGISTRY/$SERVICE:${{ github.sha }}
+          docker push $ECR_REGISTRY/$SERVICE:latest
 
       - name: Install Cosign
         run: |
           COSIGN_VERSION="v2.0.0"
-          wget -qO cosign https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64
+          wget -qO cosign \
+            https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64
           chmod +x cosign
-          mv cosign /usr/local/bin/cosign
+          sudo mv cosign /usr/local/bin/cosign
 
       - name: Sign Docker image
         if: github.event_name != 'pull_request'
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key ${{ secrets.COSIGN_KEY }} $IMAGE_NAME:latest
+          cosign sign --key ${{ secrets.COSIGN_KEY }} \
+            $ECR_REGISTRY/$SERVICE:latest
 
       - name: Upload coverage report
         if: always()

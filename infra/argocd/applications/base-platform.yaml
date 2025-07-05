@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: base-platform
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: 'https://github.com/tu-org/tu-repo.git'
+    targetRevision: main
+    path: charts/base-platform
+    helm:
+      valueFiles:
+        - values.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: actiora
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
