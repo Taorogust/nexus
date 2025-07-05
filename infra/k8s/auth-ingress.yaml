@@ -3,11 +3,14 @@ kind: Ingress
 metadata:
   name: auth-ingress
   annotations:
-    kubernetes.io/ingress.class: alb             # O “nginx” u otro controlador
+    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
 spec:
+  ingressClassName: alb
   rules:
-    - host: auth.example.com                       # Cambia por tu dominio
+    - host: auth.example.com      # Cámbialo por tu dominio real
       http:
         paths:
           - path: /
