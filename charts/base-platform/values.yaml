@@ -1,13 +1,15 @@
-﻿auth:
+﻿# charts/base-platform/values.yaml  ← (este es el que Argo CD ya está usando)
+auth:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
     tag: "latest"
-    pullPolicy: Always      # ← cambiado de IfNotPresent a Always
+    pullPolicy: Always
   replicaCount: 1
 
   oidc:
-    issuerUrl: "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"  # tu issuer
-    clientId: "75nse1j2aunml5eimimni71j"                                      # tu clientId
+    issuerUrl:   "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"
+    clientId:    "75nse1j2aunml5eimimni71j"
+    redirectUrl: "http://localhost:3000/auth/callback"   # ← aquí pon tu URL local
 
 eventbus:
   image:
