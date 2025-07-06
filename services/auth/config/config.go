@@ -1,7 +1,10 @@
 // services/auth/config/config.go
 package config
 
-import "github.com/spf13/viper"
+import (
+    "fmt"
+    "github.com/spf13/viper"
+)
 
 type OIDCConfig struct {
     Issuer       string
@@ -19,14 +22,16 @@ type Config struct {
     Server ServerConfig
 }
 
+// Load reads environment variables and returns a validated Config.
+// Panics if any required OIDC variables are missing.
 func Load() Config {
-    // No establecemos ningún EnvPrefix, para leer las vars tal cual las defines
+    // Read environment variables as-is
     viper.AutomaticEnv()
     viper.SetDefault("SERVER_PORT", "8080")
 
-    return Config{
+    cfg := Config{
         OIDC: OIDCConfig{
-            Issuer:       viper.GetString("OIDC_ISSUER_URL"),   // antes era OIDC_ISSUER
+            Issuer:       viper.GetString("OIDC_ISSUER_URL"),
             ClientID:     viper.GetString("OIDC_CLIENT_ID"),
             ClientSecret: viper.GetString("OIDC_CLIENT_SECRET"),
             RedirectURL:  viper.GetString("OIDC_REDIRECT_URL"),
@@ -35,4 +40,24 @@ func Load() Config {
             Port: viper.GetString("SERVER_PORT"),
         },
     }
+
+    // Validate required OIDC fields
+    missing := []string{}
+    if cfg.OIDC.Issuer == "" {
+        missing = append(missing, "OIDC_ISSUER_URL")
+    }
+    if cfg.OIDC.ClientID == "" {
+        missing = append(missing, "OIDC_CLIENT_ID")
+    }
+    if cfg.OIDC.ClientSecret == "" {
+        missing = append(missing, "OIDC_CLIENT_SECRET")
+    }
+    if cfg.OIDC.RedirectURL == "" {
+        missing = append(missing, "OIDC_REDIRECT_URL")
+    }
+    if len(missing) > 0 {
+        panic(fmt.Errorf("missing required OIDC environment variables: %v", missing))
+    }
+
+    return cfg
 }
