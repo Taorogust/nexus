@@ -6,9 +6,10 @@
   replicaCount: 1
 
   oidc:
-    issuerUrl:   "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com/oauth2"  
+    issuerUrl:   "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_CBuUFi3Ly"
     clientId:    "72bgd0a0sapfanm2achlfu0tu4"
     redirectUrl: "http://localhost:3000/auth/callback"
+
 
 eventbus:
   image:
