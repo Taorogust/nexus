@@ -1,5 +1,4 @@
-﻿# charts/base-platform/values.yaml  ← (este es el que Argo CD ya está usando)
-auth:
+﻿auth:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
     tag: "latest"
@@ -7,9 +6,9 @@ auth:
   replicaCount: 1
 
   oidc:
-    issuerUrl:   "https://actiora.auth.eu-west-1.amazoncognito.com"  # dominio Hosted UI configurado
-    clientId:    "72bgd0a0sapfanm2achlfu0tu4"                         # nuevo Client ID SPA OAuth
-    redirectUrl: "http://localhost:3000/auth/callback"               # URL local de callback
+    issuerUrl:   "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com/oauth2"  # ← /oauth2 al final
+    clientId:    "72bgd0a0sapfanm2achlfu0tu4"
+    redirectUrl: "http://localhost:3000/auth/callback"
 
 eventbus:
   image:
