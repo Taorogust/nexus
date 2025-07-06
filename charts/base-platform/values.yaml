@@ -1,6 +1,4 @@
-﻿# charts/base-platform/values.yaml
-
-auth:
+﻿auth:
   image:
     repository: 763695378748.dkr.ecr.eu-west-1.amazonaws.com/auth
     tag: "latest"
@@ -8,8 +6,8 @@ auth:
   replicaCount: 1
 
   oidc:
-    issuerUrl: "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"
-    clientId: "75nse1j2aunml5eimimni71j"
+    issuerUrl: "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"  # tu issuer
+    clientId: "75nse1j2aunml5eimimni71j"                                      # tu clientId
 
 eventbus:
   image:
