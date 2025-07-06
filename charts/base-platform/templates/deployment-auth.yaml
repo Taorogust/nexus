@@ -6,6 +6,10 @@ metadata:
     app: auth
     {{- include "base-platform.labels" . | nindent 4 }}
 spec:
+  template:
+    metadata:
+      annotations:
+        oidc-issuer-url: {{ .Values.auth.oidc.issuerUrl | quote }}
   replicas: {{ .Values.auth.replicaCount | default .Values.replicaCount }}
   selector:
     matchLabels:
