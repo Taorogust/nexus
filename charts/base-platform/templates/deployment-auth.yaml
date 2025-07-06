@@ -1,5 +1,4 @@
-﻿# charts/base-platform/templates/deployment-auth.yaml
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "base-platform.fullname" . }}-auth
@@ -23,7 +22,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: OIDC_ISSUER
+            - name: OIDC_ISSUER_URL
               value: {{ .Values.auth.oidc.issuerUrl | quote }}
             - name: OIDC_CLIENT_ID
               value: {{ .Values.auth.oidc.clientId | quote }}
