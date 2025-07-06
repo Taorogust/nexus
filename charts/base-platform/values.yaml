@@ -7,9 +7,9 @@ auth:
   replicaCount: 1
 
   oidc:
-    issuerUrl:   "https://actiora-auth-domain.auth.eu-west-1.amazoncognito.com"
-    clientId:    "75nse1j2aunml5eimimni71j"
-    redirectUrl: "http://localhost:3000/auth/callback"   # ← aquí pon tu URL local
+    issuerUrl:   "https://actiora.auth.eu-west-1.amazoncognito.com"  # dominio Hosted UI configurado
+    clientId:    "72bgd0a0sapfanm2achlfu0tu4"                         # nuevo Client ID SPA OAuth
+    redirectUrl: "http://localhost:3000/auth/callback"               # URL local de callback
 
 eventbus:
   image:
